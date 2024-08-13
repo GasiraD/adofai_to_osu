@@ -19,8 +19,10 @@
 
 
 "angleData":
-"bpm": 354,
+
+"bpm": 354,	
 { "floor": 1, "eventType": "SetSpeed" ... "beatsPerMinute": 100, "bpmMultiplier": 0.0625"}
+
 { "floor": 6, "eventType": "Twirl" },
 
 bpm이 100인건 비활성화된 상태고 bpm354로 치부하면됨
