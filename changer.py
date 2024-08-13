@@ -4,6 +4,11 @@ import re
 from itertools import cycle
 import math
 
+DSET = ['R', 'p', 'J', 'E', 'T', 'o', 'U', 'q', 'G', 'Q', 'H', 'W', 'L', 'x',
+ 'N', 'Z', 'F', 'V', 'D', 'Y', 'B', 'C', 'M', 'A', 'R', 'p', 'J',
+ 'E', 'T', 'o', 'U', 'q', 'G', 'Q', 'H', 'W', 'L', 'x', 'N', 'Z',
+ 'F', 'V', 'D', 'Y', 'B', 'C', 'M', 'A'] # 이건모름
+
 
 class AdoFaiParser:
     def __init__(self, filepath):
@@ -119,47 +124,38 @@ class TimingCalculator:
         angle_current = self.current_list[data[0] - 1]
         angle_next = self.next_list[data[0] - 1]
 
-        movement = (angle_next - angle_current) % 360              
+        if angle_next == 999:
+            angle_current = self.current_list[data[0] - 2]
+            angle_next = self.next_list[data[0] - 2]
+        if angle_current == 999:
+            return 0
 
-        if movement > 180:
-            movement -= 360
-        if movement < 0:
-            movement = 360 + movement
-        if data[3] is True:
+        movement = 360-((angle_next - angle_current + 540) % 360)
+        if data[3] % 2:
             movement = 360 - movement
-        if movement == 0:
-            movement = 180
 
-        
-    
-    
-        # osu! 타이밍 밀리초 계산
         milliseconds_osu = (60000 / bpm) * (movement / 180)
         return milliseconds_osu
     
-        
-
-
-
-
 
     def calculate_angle(self, data):
 
         angle_current = self.current_list[data[0] - 1]
         angle_next = self.next_list[data[0] - 1]
-        movement = (angle_next - angle_current) % 360              
-        if movement > 180:
-            movement -= 360
-        if movement < 0:
-            movement = 360 + movement
-        if data[3] is True:
+
+        if angle_next == 999:
+            angle_current = self.current_list[data[0] - 2]
+            angle_next = self.next_list[data[0] - 2]
+        if angle_current == 999:
+            return 0
+
+        movement = 360-((angle_next - angle_current + 540) % 360)
+        if data[3] % 2:
             movement = 360 - movement
-        if movement == 0:
-            movement = 180
-    
+
+
         return movement
     
-
 
     def write_osu_results(self):
         osu_timing = 0
@@ -169,6 +165,7 @@ class TimingCalculator:
                 osu_timing += timing
                 coordinates = next(self.coordinates_cycle)
                 file.write(f"{coordinates},192,{round(osu_timing)},1,0,0:0:0:0:\n")
+                  
 
     def write_osu_results_info(self):
         osu_timing = 0
@@ -176,7 +173,7 @@ class TimingCalculator:
             for t in self.final_results:
                 timing = self.calculate_timing(t)
                 osu_timing += timing
-                file.write(f"floor{t[0]}, 현재타일은{self.current_list[t[0] - 1]}, 다음타일은{self.next_list[t[0] - 1]} , angle은 {self.calculate_angle(t)}, 밀리초기준은 {osu_timing}, bpm은 {t[2]}, 회전여부는 {t[3]}\n")
+                file.write(f"floor{t[0]}, 현재타일은{self.current_list[t[0] - 1]}, 다음타일은{self.next_list[t[0] - 1]} , angle은 {round(self.calculate_angle(t))}, 밀리초기준은 {round(timing)}, bpm은 {t[2]}, 회전여부는 {t[3]}, 총{round(osu_timing)}\n")
  
 
 
