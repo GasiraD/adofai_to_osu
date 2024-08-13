@@ -21,6 +21,7 @@
 "angleData":
 
 "bpm": 354,	
+
 { "floor": 1, "eventType": "SetSpeed" ... "beatsPerMinute": 100, "bpmMultiplier": 0.0625"}
 
 { "floor": 6, "eventType": "Twirl" },
