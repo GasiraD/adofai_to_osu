@@ -30,5 +30,7 @@ bpm이 100인건 비활성화된 상태고 bpm354로 치부하면됨
 
 
 decimal angle = (NextTile - ThisTile + 540) % 360;
+
 if (Twirled) angle = 360 - angle;
+
 if (angle == 0) angle = 360;
