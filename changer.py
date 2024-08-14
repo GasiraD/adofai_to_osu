@@ -47,7 +47,7 @@ class AdoFaiParser:
         floor_data = data.get("floor")
 
         bpm= data.get("beatsPerMinute", [])
-        bpmmulti = data.get("bpmMultiplier", [])
+        bpmmulti = float(data.get("bpmMultiplier", []))
 
         if bpm is not None:
             self.bpm_dict[floor_data] = bpm
@@ -62,23 +62,26 @@ class AdoFaiParser:
         self.twirl_dict[floor_data] = True
 
     def get_final_results(self):
-        bpm_value = "None"
+        bpm_value = float(self.bpm)
         tw = 0
         for result in self.results:
             floor = result[0]
             angle_value = result[1]
 
             bpm = self.bpm_dict.get(floor, [])
-            if bpm == 100:
-                bpm = self.bpm
             bpmmulti = self.bpmmulti_dict.get(floor, [])
 
-            if bpm != []:
-                bpm_value = bpm * bpmmulti
+            if bpm != 100 and bpm != []:
+                bpm_value = bpm
+                bpmmulti = 1
+
+            if bpmmulti != []:
+                bpm_value = bpm_value * bpmmulti
                 prev_bpm_value = bpm_value
 
-            else:
+            elif bpmmulti == []:
                 bpm_value = prev_bpm_value
+
 
             twirl_value = self.twirl_dict.get(floor, [])
             if twirl_value is True:
@@ -86,7 +89,7 @@ class AdoFaiParser:
             else:
                 pass
 
-            self.final_results.append([floor, angle_value, round(bpm_value), tw])
+            self.final_results.append([floor, angle_value, bpm_value, tw])
         return self.final_results
     
     def write_final_results(self):
@@ -125,8 +128,11 @@ class TimingCalculator:
         angle_next = self.next_list[data[0] - 1]
 
         if angle_next == 999:
-            angle_current = self.current_list[data[0] - 2]
-            angle_next = self.next_list[data[0] - 2]
+            angle_current
+            angle_next = self.next_list[data[0]]
+
+            return (angle_next - angle_current + 360) % 360
+
         if angle_current == 999:
             return 0
 
@@ -134,7 +140,12 @@ class TimingCalculator:
         if data[3] % 2:
             movement = 360 - movement
 
+        if movement == 0:
+            movement = 360
+
         milliseconds_osu = (60000 / bpm) * (movement / 180)
+        #milliseconds_osu = round((1000 * movement) / (3 * bpm))
+
         return milliseconds_osu
     
 
@@ -144,14 +155,19 @@ class TimingCalculator:
         angle_next = self.next_list[data[0] - 1]
 
         if angle_next == 999:
-            angle_current = self.current_list[data[0] - 2]
-            angle_next = self.next_list[data[0] - 2]
+            angle_current
+            angle_next = self.next_list[data[0]]
+            return angle_next - angle_current
+        
         if angle_current == 999:
             return 0
 
         movement = 360-((angle_next - angle_current + 540) % 360)
         if data[3] % 2:
             movement = 360 - movement
+
+        if movement == 0:
+            movement = 360
 
 
         return movement
@@ -173,17 +189,16 @@ class TimingCalculator:
             for t in self.final_results:
                 timing = self.calculate_timing(t)
                 osu_timing += timing
-                file.write(f"floor{t[0]}, 현재타일은{self.current_list[t[0] - 1]}, 다음타일은{self.next_list[t[0] - 1]} , angle은 {round(self.calculate_angle(t))}, 밀리초기준은 {round(timing)}, bpm은 {t[2]}, 회전여부는 {t[3]}, 총{round(osu_timing)}\n")
+                file.write(f"floor{t[0]}, 현재타일은{self.current_list[t[0] - 1]}, 다음타일은{self.next_list[t[0] - 1]} , angle은 {self.calculate_angle(t)}, 밀리초기준은 {round(timing)}, bpm은 {round(t[2])}, 회전여부는 {t[3]}, 총{round(osu_timing)}\n")
  
 
 
 def main():
     adofai_parser = AdoFaiParser('main.adofai')
     final_results = adofai_parser.get_final_results()
+
     timing_calculator = TimingCalculator(final_results)
-
-
-    adofai_parser.write_final_results()
+    #adofai_parser.write_final_results()
     timing_calculator.write_osu_results()
     timing_calculator.write_osu_results_info()
 
