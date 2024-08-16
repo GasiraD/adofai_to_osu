@@ -10,6 +10,8 @@ DSET = ['R', 'p', 'J', 'E', 'T', 'o', 'U', 'q', 'G', 'Q', 'H', 'W', 'L', 'x',
  'F', 'V', 'D', 'Y', 'B', 'C', 'M', 'A'] # 이건모름
 
 
+
+
 class AdoFaiParser:
     def __init__(self, filepath):
         self.filepath = filepath
@@ -130,13 +132,28 @@ class TimingCalculator:
         if angle_next == 999:
             angle_current
             angle_next = self.next_list[data[0]]
+            movementz = (angle_current - angle_next) % 360
+            if movementz < 0:
+                movementz = (movementz + 360) % 360
 
-            return (angle_next - angle_current + 360) % 360
+            if data[3] % 2:
+                movementz = 360 - movementz
+
+            if movementz == 0:
+                movementz = 360
+
+            milliseconds_osu = (60000 / bpm) * (movementz / 180)
+            #milliseconds_osu = round((1000 * movement) / (3 * bpm))
+
+            return milliseconds_osu
 
         if angle_current == 999:
             return 0
 
         movement = 360-((angle_next - angle_current + 540) % 360)
+
+
+
         if data[3] % 2:
             movement = 360 - movement
 
@@ -157,12 +174,19 @@ class TimingCalculator:
         if angle_next == 999:
             angle_current
             angle_next = self.next_list[data[0]]
-            return angle_next - angle_current
+            movementz = (angle_current - angle_next) % 360
+            if movementz < 0:
+                movementz = (movementz + 360) % 360
+
+            return movementz
         
         if angle_current == 999:
             return 0
+        
 
         movement = 360-((angle_next - angle_current + 540) % 360)
+
+
         if data[3] % 2:
             movement = 360 - movement
 
@@ -180,6 +204,8 @@ class TimingCalculator:
                 timing = self.calculate_timing(t)
                 osu_timing += timing
                 coordinates = next(self.coordinates_cycle)
+                if self.calculate_angle(t) == 0:
+                    continue
                 file.write(f"{coordinates},192,{round(osu_timing)},1,0,0:0:0:0:\n")
                   
 
@@ -189,6 +215,8 @@ class TimingCalculator:
             for t in self.final_results:
                 timing = self.calculate_timing(t)
                 osu_timing += timing
+                if self.calculate_angle(t) == 0:
+                    continue
                 file.write(f"floor{t[0]}, 현재타일은{self.current_list[t[0] - 1]}, 다음타일은{self.next_list[t[0] - 1]} , angle은 {self.calculate_angle(t)}, 밀리초기준은 {round(timing)}, bpm은 {round(t[2])}, 회전여부는 {t[3]}, 총{round(osu_timing)}\n")
  
 
