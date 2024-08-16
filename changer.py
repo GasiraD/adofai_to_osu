@@ -35,6 +35,8 @@ class AdoFaiParser:
                 self._parse_set_speed(line)
             elif '"eventType": "Twirl"' in line:
                 self._parse_twirl(line)
+            elif "bpm" in line:
+                self._parse_bpm(line)
 
     def _parse_angle_data(self, line):
         line = '{' + line.strip().rstrip(',') + '}'
@@ -62,6 +64,11 @@ class AdoFaiParser:
         data = json.loads(line)
         floor_data = data.get("floor")
         self.twirl_dict[floor_data] = True
+     
+    def _parse_bpm(self, line):
+        line = line.strip().rstrip(',')
+        data = json.loads(line)
+        self.bpm = data.get("bpm")
 
     def get_final_results(self):
         bpm_value = float(self.bpm)
