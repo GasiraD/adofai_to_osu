@@ -1,38 +1,18 @@
-# adofai_to_osu
+과거 angledata 대응
 
+처음타일에 setbpm없을때 대응
 
-# .osu
-.osu 는 osu파일 
-[TimingPoints]는 bpm정하는거랑 언제 그 bpm이 적용되는지
+999여러개
 
-[HitObjects]에서 64,192,200,1,0,0:0:0:0: 3번째값이 제일중요함 밀리세컨드기준으로 순차적으로 합쳐지면서 증가
+마지막 노트 한번더 나오는거 확인
 
-64,192,200,1,0,0:0:0:0:
+처음 시작 타이밍 맞출 방법 찾기
 
-192,192,350,1,0,0:0:0:0:
+타이밍출력된것 바탕으로 자동으로 .osu 맵 생성 하기
 
-448,192,400,1,0,0:0:0:0:
+7키 대응
 
+ui
 
-# .adofai
-.adofai는 json이랑 비슷하지만 json은 아님
+노래가져오기
 
-
-"angleData":
-
-"bpm": 354,	
-
-{ "floor": 1, "eventType": "SetSpeed" ... "beatsPerMinute": 100, "bpmMultiplier": 0.0625"}
-
-{ "floor": 6, "eventType": "Twirl" },
-
-bpm이 100인건 비활성화된 상태고 bpm354로 치부하면됨
-
-
-NextTile=0
-
-ThisTile=0
-
-angle = 360-((NextTile - ThisTile + 540) % 360)
-
-print(angle)
