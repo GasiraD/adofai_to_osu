@@ -2,6 +2,7 @@ import json
 import os
 import re
 from itertools import cycle
+from adofai_pathdata_converter import old_converter
 import math
 
 DSET = ['R', 'p', 'J', 'E', 'T', 'o', 'U', 'q', 'G', 'Q', 'H', 'W', 'L', 'x',
