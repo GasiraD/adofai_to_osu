@@ -30,7 +30,7 @@ class AdoFaiParser:
         lines = adofai_data.splitlines()
 
         for line in lines:
-            if "angleData" in line:
+            if "angleData" in line or "pathData" in line:
                 self._parse_angle_data(line)
             elif '"eventType": "SetSpeed"' in line:
                 self._parse_set_speed(line)
@@ -42,7 +42,10 @@ class AdoFaiParser:
     def _parse_angle_data(self, line):
         line = '{' + line.strip().rstrip(',') + '}'
         data = json.loads(line)
-        angle_data = data.get("angleData", [])
+        if "pathData" in line:
+            angle_data = old_converter().convert_data(data.get("pathData", []))
+        else:
+            angle_data = data.get("angleData", [])
         for index, value in enumerate(angle_data, start=1):
             self.results.append([index, value, None, False])
 
