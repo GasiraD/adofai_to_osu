@@ -1,6 +1,10 @@
 # 필요 대응 리스트
 
 과거 angledata 
+- R: 우측 진행 블럭 (Right)
+- L: 좌측 진행 블럭 (Left)
+- U: 상단 진행 블럭 (Up)
+- D: 하단 진행 블럭 (Down)
 
 처음타일에 setbpm없을 때 
 
